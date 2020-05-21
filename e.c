@@ -1,6 +1,8 @@
 /*
  *  E
  */
+#include <ctype.h>
+#include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <termios.h>
@@ -31,7 +33,13 @@ main(int argc, char *argv[])
   enable_raw_mode();
 
   char c;
-  while (read(STDIN_FILENO, &c, 1) && c != 'q');
+  while (read(STDIN_FILENO, &c, 1) && c != 'q') {
+    if (iscntrl(c)) {
+      printf("%d\n", c);
+    } else {
+      printf("%d ('%c')\n", c, c);
+    }
+  }
 
   return 0;
 }
