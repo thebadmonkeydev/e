@@ -18,9 +18,6 @@ ${OBJ}: config.h config.mk
 config.h:
 	cp config.def.h $@
 
-e: ${OBJ}
-	${CC} -o $@ ${OBJ}
-
 clean:
 	rm -f ./e ${OBJ}
 
