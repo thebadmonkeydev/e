@@ -8,6 +8,8 @@
 #include <termios.h>
 #include <unistd.h>
 
+#define CTRL_KEY(k) ((k) & 0x1f)
+
 struct termios orig_termios;
 
 void
@@ -17,18 +19,20 @@ die(const char *s) {
 }
 
 void
-disable_raw_mode() {
+teardown() {
   if(tcsetattr(STDIN_FILENO, TCSAFLUSH,  &orig_termios) == -1)
     die("tcsetattr");
 }
 
+// Enable raw mode and other convinient terminal settings
+// runs teardown() using atexit()
 void
-enable_raw_mode() {
+setup() {
   // Store original terminal config
   if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
 
   // Schedule resetting to original config at exit
-  atexit(disable_raw_mode);
+  atexit(teardown);
 
   /*
    * Disable terminal flags:
@@ -58,24 +62,31 @@ enable_raw_mode() {
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcgetattr");
 }
 
+char
+read_key() {
+  char c = '\0';
+  if (read(STDIN_FILENO, &c, 1) == -1) die("read");
+  return c;
+}
+
+void
+process_keys() {
+  char c = read_key();
+
+  switch (c) {
+    case CTRL_KEY('q'):
+      exit(0);
+      break;
+  }
+}
+
 int
 main(int argc, char *argv[])
 {
-  // Enable raw mode and other convinient terminal settings
-  // runs disable_raw_mode() using atexit()
-  enable_raw_mode();
+  setup();
 
   while (1) {
-    char c = '\0';
-    if (read(STDIN_FILENO, &c, 1) == -1) die("read");
-
-    if (iscntrl(c)) {
-      printf("%d\r\n", c);
-    } else {
-      printf("%d ('%c')\r\n", c, c);
-    }
-
-    if (c == 'q') break;
+    process_keys();
   }
 
   return 0;
