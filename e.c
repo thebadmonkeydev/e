@@ -12,22 +12,22 @@
 
 struct termios orig_termios;
 
-void
-die(const char *s) {
+void refresh();
+
+void die(const char *s) {
+  refresh();
   perror(s);
   exit(1);
 }
 
-void
-teardown() {
+void teardown() {
   if(tcsetattr(STDIN_FILENO, TCSAFLUSH,  &orig_termios) == -1)
     die("tcsetattr");
 }
 
 // Enable raw mode and other convinient terminal settings
 // runs teardown() using atexit()
-void
-setup() {
+void setup() {
   // Store original terminal config
   if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
 
@@ -62,15 +62,14 @@ setup() {
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcgetattr");
 }
 
-char
-read_key() {
+
+char read_key() {
   char c = '\0';
   if (read(STDIN_FILENO, &c, 1) == -1) die("read");
   return c;
 }
 
-void
-process_keys() {
+void process_keys() {
   char c = read_key();
 
   switch (c) {
@@ -80,12 +79,27 @@ process_keys() {
   }
 }
 
-int
-main(int argc, char *argv[])
+void draw_rows() {
+  for (int y = 0; y < 24; y++) {
+    write(STDOUT_FILENO, "~\r\n", 3);
+  }
+}
+
+void refresh() {
+  write(STDOUT_FILENO, "\x1b[2J", 4);
+  write(STDOUT_FILENO, "\x1b[H", 3);
+
+  draw_rows();
+
+  write(STDOUT_FILENO, "\x1b[H", 3);
+}
+
+int main(int argc, char *argv[])
 {
   setup();
 
   while (1) {
+    refresh();
     process_keys();
   }
 
