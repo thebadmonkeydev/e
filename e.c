@@ -2,22 +2,30 @@
  *  E
  */
 #include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <termios.h>
+#include <unistd.h>
 
 struct termios orig_termios;
 
 void
+die(const char *s) {
+  perror(s);
+  exit(1);
+}
+
+void
 disable_raw_mode() {
-  tcsetattr(STDIN_FILENO, TCSAFLUSH,  &orig_termios);
+  if(tcsetattr(STDIN_FILENO, TCSAFLUSH,  &orig_termios) == -1)
+    die("tcsetattr");
 }
 
 void
 enable_raw_mode() {
   // Store original terminal config
-  tcgetattr(STDIN_FILENO, &orig_termios);
+  if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
 
   // Schedule resetting to original config at exit
   atexit(disable_raw_mode);
@@ -41,13 +49,13 @@ enable_raw_mode() {
    * CS8    - Sets character width to 8-bits (likely already on as well)
    */
   struct termios raw = orig_termios;
-  raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-  raw.c_oflag &= ~(OPOST);
   raw.c_cflag |= (CS8);
+  raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
   raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+  raw.c_oflag &= ~(OPOST);
 
   // Set our custom terminal config
-  tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcgetattr");
 }
 
 int
@@ -57,13 +65,17 @@ main(int argc, char *argv[])
   // runs disable_raw_mode() using atexit()
   enable_raw_mode();
 
-  char c;
-  while (read(STDIN_FILENO, &c, 1) && c != 'q') {
+  while (1) {
+    char c = '\0';
+    if (read(STDIN_FILENO, &c, 1) == -1) die("read");
+
     if (iscntrl(c)) {
       printf("%d\r\n", c);
     } else {
       printf("%d ('%c')\r\n", c, c);
     }
+
+    if (c == 'q') break;
   }
 
   return 0;
