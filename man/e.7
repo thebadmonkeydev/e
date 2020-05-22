@@ -1,0 +1,42 @@
+.TH E 1 e\-VERSION
+.SH NAME
+E \- A text editor my way
+.SH DESCRIPTION
+This document contains my notes and thoughts while developing E including it's theory of operation
+.SH OPERATING ENVIRONMENT
+E is a VT100 compatible terminal application built in C.  It requires a C99 compliant libc and a VT100 compatible terminal.
+.SH GOALS
+
+\- Modal editing similar to vim (inset/command/visual)
+
+\- Entirely keymapped (including the ability to execute arbitrary shell commands i.e. run specs, start a build, etc.)
+
+\- Syntax Highlighting
+
+\- Line Numbering
+
+\- Buffered file i/o
+
+\- Current buffer search
+
+.SH THEORY OF OPERATION
+My notes and research product generated while planning and building E
+
+.SS WORKFLOW
+
+E is an entirely terminal based application used in a similar fashion to Vim except without all the bloat.
+The basic workflow of the main application is:
+
+.RS
+1. Setup the terminal environment ("raw" mode)
+
+2. Load/Parse file buffer
+
+2. Loop on user input action
+
+3. Restore the terminal to original environment
+
+4. Exit
+.RE
+
+.SH STRUCTURE
