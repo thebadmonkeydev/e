@@ -4,7 +4,7 @@ E \- A text editor my way
 .SH DESCRIPTION
 This document contains my notes and thoughts while developing E including it's theory of operation
 .SH OPERATING ENVIRONMENT
-E is a VT100 compatible terminal application built in C.  It requires a C99 compliant libc and a VT100 compatible terminal.
+E is a VT10X compatible terminal application built in C.  It requires a C99 compliant libc and a VT10X compliant terminal.
 .SH GOALS
 
 \- Modal editing similar to vim (inset/command/visual)
@@ -12,6 +12,11 @@ E is a VT100 compatible terminal application built in C.  It requires a C99 comp
 \- Entirely keymapped (including the ability to execute arbitrary shell commands i.e. run specs, start a build, etc.)
 
 \- Syntax Highlighting
+.RS
+git clone git://git.savannah.gnu.org/src-highlite.git
+
+(Can be used as a cpp lib libsrchilite or as a terminal command)
+.RE
 
 \- Line Numbering
 
@@ -40,3 +45,28 @@ The basic workflow of the main application is:
 .RE
 
 .SH STRUCTURE
+
+.RB e.h
+.RS
+Defines the E entrypoint along with global state management
+.RE
+
+.RB term.h
+.RS
+Contains all terminal-specific functions like setting up the TUI, writing to the terminal, etc.
+.RE
+
+.RB buffer.h
+.RS
+All functionality and state necessary to load a file into a memory buffer
+.RE
+
+.RB input.h
+.RS
+All input processing functions
+.RE
+
+.RB config.def.h
+.RS
+User defined configuration options
+.RE
