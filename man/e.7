@@ -27,6 +27,11 @@ git clone git://git.savannah.gnu.org/src-highlite.git
 .SH THEORY OF OPERATION
 My notes and research product generated while planning and building E
 
+Initial proof of concept and a lot of the base information is built upon
+.UR https://viewsourcecode.org/snaptoken/kilo/index.html
+this walkthrough
+.UE .
+
 .SS WORKFLOW
 
 E is an entirely terminal based application used in a similar fashion to Vim except without all the bloat.
@@ -43,6 +48,35 @@ The basic workflow of the main application is:
 
 4. Exit
 .RE
+
+.SS LAYOUT
+.EX
+ ----------------------------------------------------------------------
+| 1|                                                                   |
+| 2|                                                                   |
+| 3|                                                                   |
+| 4|                                                                   |
+| 5|                                                                   |
+|~                                                                     |
+|~                                                                     |
+|~                                                                     |
+|~                                                                     |
+|~                                                                     |
+|~                                                                     |
+|~                                                                     |
+|~                                                                     |
+|~                                                                     |
+|______________________________________________________________________|
+| foo/bar.baz                                                1234/1234 |
+ ----------------------------------------------------------------------
+ ^^ ^
+ || |
+ || Current buffer name
+ ||
+ |Line Number
+ |
+ Gutter
+.EE
 
 .SH STRUCTURE
 
