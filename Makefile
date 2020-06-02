@@ -15,11 +15,8 @@ options:
 
 ${OBJ}: config.h config.mk
 
-config.h:
-	cp config.def.h $@
-
 clean:
-	rm -f ./e ${OBJ} config.h
+	rm -f ./e ${OBJ}
 
 install: all
 	mkdir -p ${DESTDIR}${PREFIX}/bin
